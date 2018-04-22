@@ -1,13 +1,9 @@
 #pragma once
 
 #include <Windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <locale>
+#include <cstdio>
 #include "glut.h"
 #include <queue>
-#include <vector>
-#include <algorithm>
 
 #include "Particle.h"
 #include "Event.h"
@@ -45,4 +41,4 @@ GLvoid keyPressed(unsigned char key, int x, int y);
 GLvoid idle();
 GLvoid initVariables();
 GLboolean loadTexture(LPTSTR szFileName, GLuint &texid);
-void test(int n);
+void test(int i);

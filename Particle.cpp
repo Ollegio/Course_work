@@ -2,10 +2,7 @@
 #include "Vec.h"
 #include "Event.h"
 #include <vector>
-#include <algorithm>
 #include <queue>
-#include <chrono>
-using namespace std::chrono;
 
 Vec vInitVel = Vec(0.0, 0.0, 0.0);
 std::vector<Event> pq;
@@ -31,11 +28,11 @@ Particle::Particle(double x, double y, double z, double vx, double vy, double vz
 	colCount = 0;
 }
 
-void Particle::move(double time) {
+void Particle::move(const double time) {
 	setPos(getPos() + getVel() * time);
 }
 
-double Particle::collidesX() {
+double Particle::collidesX() const {
 	double res;
 	if (getVel().x() > EPSILON)
 		res = (300 - radius - getPos().x()) / getVel().x();
@@ -47,7 +44,7 @@ double Particle::collidesX() {
 	return res;
 }
 
-double Particle::collidesY() {
+double Particle::collidesY() const {
 	double res;
 	if (getVel().y() > EPSILON)
 		res = (300 - radius - getPos().y()) / getVel().y();
@@ -59,7 +56,7 @@ double Particle::collidesY() {
 	return res;
 }
 
-double Particle::collidesZ() {
+double Particle::collidesZ() const {
 	double res;
 	if (getVel().z() > EPSILON)
 		res = (300 - radius - getPos().z()) / getVel().z();
@@ -71,7 +68,7 @@ double Particle::collidesZ() {
 	return res;
 }
 
-double Particle::collidesMaxwellDoor() {
+double Particle::collidesMaxwellDoor() const {
 	double res;
 	if (getPos().x() < 0 && getVel().length() < meanVel && getVel().x() > EPSILON)
 		res = (-radius - getPos().x()) / getVel().x();
@@ -83,20 +80,20 @@ double Particle::collidesMaxwellDoor() {
 	return res;
 }
 
-double Particle::collides(Particle *b) {
-	Vec dr = getPos() - b->getPos(),
+double Particle::collides(Particle *b) const {
+	const Vec dr = getPos() - b->getPos(),
 		dv = getVel() - b->getVel();
-	double
+	const double
 		r2 = dot(dr, dr),
 		v2 = dot(dv, dv),
 		vr = dot(dv, dr);
 	if (vr > -EPSILON)
 		return -1.0;
-	double d = pow(vr, 2) - v2 * (r2 - pow((radius)+b->radius, 2));
+	const double d = pow(vr, 2) - v2 * (r2 - pow((radius)+b->radius, 2));
 	if (d < EPSILON)
 		return -1.0;
 
-	double res = -((vr + sqrt(d)) / v2);
+	const double res = -((vr + sqrt(d)) / v2);
 	return res;
 }
 
@@ -116,12 +113,12 @@ void Particle::bounceZ(){
 }
 
 void Particle::bounce(Particle *p) {
-	Vec
+	const Vec
 		v1 = this->getVel(),
 		v2 = p->getVel(),
 		p1 = this->getPos(),
 		p2 = p->getPos();
-	double
+	const double
 		m1 = this->mass,
 		m2 = p->mass;
 
@@ -135,42 +132,42 @@ int Particle::getCollisionCount() const {
 	return colCount;
 }
 
-const float *Particle::getColor() {
+const float *Particle::getColor() const {
 	return &this->color[0];
 }
 
-void Particle::setColor(float r, float g, float b) {
+void Particle::setColor(const float r, const float g, const float b) {
 	color[0] = r;
 	color[1] = g;
 	color[2] = b;
 }
 
-Vec Particle::getVel() {
+Vec Particle::getVel() const {
 	return vVel;
 }
 
-Vec Particle::getPos() {
+Vec Particle::getPos() const {
 	return pPos;
 }
 
-void Particle::setVel(Vec v) {
+void Particle::setVel(const Vec v) {
 	vVel = v;
 }
 
-void Particle::setPos(Vec v) {
+void Particle::setPos(const Vec v) {
 	pPos = v;
 }
 
-const double Particle::getR() {
+double Particle::getR() const {
 	return radius;
 }
 
 void Particle::updateEvents() {
-	double xTime = this->collidesX(),
+	const double xTime = this->collidesX(),
 		yTime = this->collidesY(),
 		zTime = this->collidesZ();
-	if (Particle::meanVel != 0) {
-		double mTime = this->collidesMaxwellDoor();
+	if (meanVel != 0) {
+		const double mTime = this->collidesMaxwellDoor();
 		if (mTime != -1.0) {
 			ct.push(Event(currentTime + mTime, this, nullptr, 1));
 		}
@@ -186,7 +183,7 @@ void Particle::updateEvents() {
 	}
 	for (int j = 0; j < PARTICLES_COUNT; j++) {
 		if (this != &particles[j]) {
-			double abTime = this->collides(&particles[j]);
+			const double abTime = this->collides(&particles[j]);
 			if (abTime != -1.0) {
 				ct.push(Event(currentTime + abTime, this, &particles[j], 4));
 			}	

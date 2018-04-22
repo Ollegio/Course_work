@@ -2,7 +2,6 @@
 #include "Particle.h"
 #include "Event.h"
 
-
 GLvoid resizeGLScene(GLsizei width, GLsizei height) {
 	if (height == 0) // Предотвращение деления на ноль 
 		height = 1;
@@ -11,12 +10,12 @@ GLvoid resizeGLScene(GLsizei width, GLsizei height) {
 	glMatrixMode(GL_PROJECTION); // Выбор матрицы проекций 
 	glLoadIdentity(); // Сброс матрицы проекции 
 					  // Вычисление соотношения геометрических размеров для окна 
-	gluPerspective(50.0f, (GLfloat)width / (GLfloat)height, 10.f, 1700.0f);
+	gluPerspective(50.0f, GLfloat(width) / GLfloat(height), 10.f, 1700.0f);
 	glMatrixMode(GL_MODELVIEW); // Выбор матрицы вида модели 
 	glLoadIdentity(); // Сброс матрицы вида модели 
 }
 
-GLboolean initGLScene(GLvoid) {
+GLboolean initGLScene() {
 	glClearDepth(1.0f); // Разрешить очистку буфера глубины 
 	glEnable(GL_DEPTH_TEST); // Разрешить тест глубины 
 	glDepthFunc(GL_LEQUAL); // Тип теста глубины 
@@ -40,18 +39,18 @@ GLboolean initGLScene(GLvoid) {
 	return true;
 }
 
-GLint drawGLScene(GLvoid) {
+GLint drawGLScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Очистить экран и буфер глубины 
 	glLoadIdentity(); // Сбросить текущую матрицу 
 
-	double a = 1000.0 * sin(0.017453 * (cameraTilt));
-	double b = 1000.0 * cos(0.017453 * (cameraTilt));
+	const double a = 1000.0 * sin(0.017453 * (cameraTilt));
+	const double b = 1000.0 * cos(0.017453 * (cameraTilt));
 
 	gluLookAt(camPosition.x(), camPosition.y() + a, camPosition.z() + b, camPosition.x() + camDirection.x(), camPosition.y() + camDirection.y(), camPosition.z() + camDirection.z(), 0, 1.0, 0.0);
 	glRotatef(cameraRotation, 0, 1, 0);
 
 	for (int i = 0; i < PARTICLES_COUNT; i++) {
-		if (velocityColor == true)
+		if (velocityColor)
 			glColor3f(particles[i].getVel().length(), 0.0, 1.0 / particles[i].getVel().length());
 		else
 			glColor3fv(particles[i].getColor());
@@ -103,7 +102,7 @@ GLvoid createWin(char* title, GLfloat winWidth, GLfloat winHeight) {
 	wnd = glutCreateWindow(title);
 }
 
-GLvoid renderScene(GLvoid)
+GLvoid renderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -112,7 +111,7 @@ GLvoid renderScene(GLvoid)
 	glutSwapBuffers();
 }
 
-GLvoid keyPressed(unsigned char key, int x, int y) {
+GLvoid keyPressed(const unsigned char key, int x, int y) {
 	if (key == VK_ESCAPE) {
 		glutDestroyWindow(wnd);
 		exit(0);
@@ -133,7 +132,6 @@ GLvoid keyPressed(unsigned char key, int x, int y) {
 }
 
 int main() {
-	setlocale(LC_ALL, "Russian");
 	printf("Введите количество шаров (0 - тестовый режим)\n");
 	int n;
 	scanf("%d", &n);
@@ -228,10 +226,9 @@ GLvoid initVariables() {
 }
 
 GLboolean loadTexture(LPTSTR szFileName, GLuint &texid) {
-	HBITMAP hBMP;
 	BITMAP BMP;
 	glGenTextures(1, &texid);
-	hBMP = (HBITMAP)LoadImage(GetModuleHandle(NULL), szFileName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	const auto hBMP = HBITMAP(LoadImage(GetModuleHandle(nullptr), szFileName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
 
 	if (!hBMP)
 		return FALSE;
@@ -352,7 +349,7 @@ void test(int i) {
 			for (int y = 0; y < latticeX; y++) {
 				for (int x = 0; x < latticeX; x++) {
 					Particle ball = Particle(-270.0 + x * 60, y * 60 - 270.0, -250.0 + z * 60,
-						((rand() % 20)) / 10.0, ((rand() % 20)) / 10.0, ((rand() % 20)) / 10.0,
+						(rand() % 20) / 10.0, (rand() % 20) / 10.0, (rand() % 20) / 10.0,
 						1.0, 15);
 					particles[x + z * latticeX * latticeX + y * latticeX] =
 						ball;
@@ -375,6 +372,13 @@ void test(int i) {
 			}
 		}
 		Particle::meanVel = sqrt(3.0);
+		break;
+	default: 
+		PARTICLES_COUNT = 1;
+		particles[0] =
+			Particle(5.0, 0.0, 100.0,
+				0.0, 0.0, 1.0,
+				1.0, 20);
 		break;
 	}
 }

@@ -1,10 +1,9 @@
 #pragma once
-#include <math.h>
+#include <cmath>
 
 const double EPSILON = 1.0e-8;
 
 class Vec {
-private:
 	double _x;
 	double _y;
 	double _z;
@@ -16,11 +15,11 @@ public:
 	double z() const;
 	double length() const;
 	double dot(const Vec &v) const;
-	Vec &add(const Vec &v) const;
-	Vec &subtract(const Vec &v) const;
-	Vec &invert() const;
-	Vec &multiply(const double &scale) const;
-	Vec &divide(const double &divide) const;
+	Vec add(const Vec &v) const;
+	Vec subtract(const Vec &v) const;
+	Vec invert() const;
+	Vec multiply(const double &scale) const;
+	Vec divide(const double & div) const;
 
 	friend double dot(const Vec &v1, const Vec &v2) {
 		return v1.dot(v2);
